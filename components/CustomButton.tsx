@@ -6,6 +6,7 @@ interface CustomButtonProps {
   handlePress: () => void;
   containerStyle?: string;
   textStyle?: string;
+  isLoading?: boolean;
 }
 
 const CustomButton = ({
@@ -13,16 +14,16 @@ const CustomButton = ({
   handlePress,
   containerStyle,
   textStyle,
+  isLoading,
 }: CustomButtonProps) => {
   return (
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
-      className={` ${containerStyle}`}
+      className={` ${containerStyle} ${isLoading ? "opacity-50" : ""}`}
+      disabled={isLoading}
     >
-      <Text className={`${textStyle}`}>
-        {title}
-      </Text>
+      <Text className={`${textStyle}`}>{title}</Text>
     </TouchableOpacity>
   );
 };
