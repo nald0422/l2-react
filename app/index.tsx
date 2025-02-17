@@ -1,9 +1,9 @@
 import { ScrollView, Text, View, Image } from "react-native";
 import { Redirect, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { images } from "../constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
+import { images } from "@/constants";
 import CustomButton from "@/components/CustomButton";
 
 export default function Index() {
@@ -25,7 +25,7 @@ export default function Index() {
             <CustomButton
               title="Continue"
               handlePress={() => router.push("/sign_in")}
-              containerStyle="bg-red-500 rounded-[12px] min-h-[24px] justify-center items-center py-5"
+              containerStyle="bg-primary rounded-[12px] min-h-[24px] justify-center items-center py-5"
               textStyle="font-semibold text-white text-sm"
             />
           </View>
