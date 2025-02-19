@@ -5,6 +5,12 @@ import { images } from "@/constants";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
 import { router, Link } from "expo-router";
+import apiService from "../../services/apiService";
+
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+}
 
 const sign_in = () => {
   const [form, setForm] = useState({
@@ -13,12 +19,33 @@ const sign_in = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const submit = () => {
+  const submit = async () => {
+    if (form.email === "" || form.password === "") {
+      setError("An error occurred during sign up");
+      return;
+    }
+
     setIsSubmitting(true);
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const response = await apiService.post<ApiResponse>("/auth/signup", {
+        email: form.email,
+        password: form.password,
+      });
+
+      if (response.success) {
+        router.replace("/home");
+      } else {
+        setError(response.message || "Sign in failed");
+      }
+    } catch (err) {
+      setError("An error occurred during sign up");
+    } finally {
       setIsSubmitting(false);
-    }, 5000);
+    }
   };
 
   return (

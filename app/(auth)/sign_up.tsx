@@ -1,25 +1,53 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { images } from "@/constants";
-import FormField from "@/components/FormField";
-import CustomButton from "@/components/CustomButton";
+import FormField from "../../components/FormField";
+import CustomButton from "../../components/CustomButton";
 import { router, Link } from "expo-router";
+import apiService from "../../services/apiService";
+
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+}
+
 
 const sign_up = () => {
   const [form, setForm] = useState({
     email: "",
+    name: "",
     password: "",
     confirmed_password: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const submit = () => {
+  const submit = async () => {
+    if (form.password !== form.confirmed_password) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setIsSubmitting(true);
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const response = await apiService.post<ApiResponse>("/auth/signup", {
+        email: form.email,
+        password: form.password,
+      });
+
+      if (response.success) {
+        router.replace("/home");
+      } else {
+        setError(response.message || "Sign up failed");
+      }
+    } catch (err) {
+      setError("An error occurred during sign up");
+    } finally {
       setIsSubmitting(false);
-    }, 5000);
+    }
   };
 
   return (
@@ -30,21 +58,26 @@ const sign_up = () => {
           <Text className="text-[#8F9098] mt-2">
             Create an account to get started
           </Text>
+
+          {error && (
+            <View className="mt-4 p-2 bg-red-100 rounded">
+              <Text className="text-red-600">{error}</Text>
+            </View>
+          )}
           <View>
             <FormField
               title="Name"
               placeholder="Enter Name"
-              value={form.email}
-              handleChangeText={(e) => setForm({ ...form, email: e })}
+              value={form.name}
+              handleChangeText={(e: string) => setForm({ ...form, name: e })}
               otherStyles="mt-7"
-              keyboardType="email-address"
               showLabel={true}
             />
             <FormField
               title="Email"
               placeholder="Enter Email"
               value={form.email}
-              handleChangeText={(e) => setForm({ ...form, email: e })}
+              handleChangeText={(e: string) => setForm({ ...form, email: e })}
               otherStyles="mt-7"
               keyboardType="email-address"
               showLabel={true}
@@ -53,7 +86,7 @@ const sign_up = () => {
               title="Password"
               placeholder="Create a password"
               value={form.password}
-              handleChangeText={(e) => setForm({ ...form, password: e })}
+              handleChangeText={(e: string) => setForm({ ...form, password: e })}
               otherStyles="mt-7"
               showLabel={true}
             />
@@ -61,7 +94,7 @@ const sign_up = () => {
               title="Password"
               placeholder="Confirm Password"
               value={form.confirmed_password}
-              handleChangeText={(e) => setForm({ ...form, password: e })}
+              handleChangeText={(e: string) => setForm({ ...form, confirmed_password: e })}
               otherStyles="mt-5"
             />
             <CustomButton
